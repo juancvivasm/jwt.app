@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -30,6 +31,7 @@ public class WebSecurityConfiguration {
 
     @Autowired
     private JpaUserDetailsService userDetailService;
+
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -53,25 +55,35 @@ public class WebSecurityConfiguration {
         return authProvider;
     }
 
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
-//        return authConfiguration.getAuthenticationManager();
-//    }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
+        return authConfiguration.getAuthenticationManager();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.disable()).csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
-                        .anyRequest().authenticated())
-                //.authenticationProvider(authenticationProvider())
+                        .anyRequest().authenticated()
+                        //.anyRequest().permitAll()
+                        )
+                .authenticationProvider(authenticationProvider())
                 .addFilter(new JWTAuthenticationFilter(authConfiguration.getAuthenticationManager()))
+                .addFilter(new JWTAuthenticationVerficationFilter(authConfiguration.getAuthenticationManager()))
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-        ;
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+
+//        http.addFilterBefore(customHeaderValidatorFilter(),
+//                BasicAuthenticationFilter.class);
 
         return http.build();
     }
+
+//    @Bean
+//    public CustomHeaderValidatorFilter customHeaderValidatorFilter() {
+//        return new CustomHeaderValidatorFilter();
+//    }
 }
