@@ -1,4 +1,4 @@
-package com.bolsadeideas.springboot.jwt.app.security;
+package com.bolsadeideas.springboot.jwt.app.utils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

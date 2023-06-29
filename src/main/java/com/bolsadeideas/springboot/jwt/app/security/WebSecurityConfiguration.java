@@ -1,5 +1,6 @@
 package com.bolsadeideas.springboot.jwt.app.security;
 
+import com.bolsadeideas.springboot.jwt.app.service.JWTService;
 import com.bolsadeideas.springboot.jwt.app.service.JpaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,8 @@ public class WebSecurityConfiguration {
     @Autowired
     private JpaUserDetailsService userDetailService;
 
+    @Autowired
+    private JWTService jwtService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -61,10 +64,10 @@ public class WebSecurityConfiguration {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
                         .anyRequest().authenticated()
-                        )
+                )
                 .authenticationProvider(authenticationProvider())
-                .addFilter(new JWTAuthenticationFilter(authConfiguration.getAuthenticationManager()))
-                .addFilter(new JWTAuthenticationVerficationFilter(authConfiguration.getAuthenticationManager()))
+                .addFilter(new JWTAuthenticationFilter(authConfiguration.getAuthenticationManager(), jwtService))
+                .addFilter(new JWTAuthenticationVerficationFilter(authConfiguration.getAuthenticationManager(), jwtService))
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptionHandling -> exceptionHandling
