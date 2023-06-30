@@ -33,4 +33,4 @@ Para compilar y ejecutar el proyecto:
 | Methods | Requests                           | Query Params                                                                        |
 |---------|------------------------------------|-------------------------------------------------------------------------------------|
 | POST    | http://localhost:8080/api/login    | <code> { <br>&nbsp;"username": "admin", <br>&nbsp;"password": "12345" <br>} </code> |
-| GET     | http://localhost:8080/api/clients  |                                                                                     |
+| GET     | http://localhost:8080/api/clients  | Authorization Bearer Token                                                          |
